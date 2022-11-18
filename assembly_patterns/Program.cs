@@ -302,7 +302,7 @@ public class pattern_finder
             buildReturnStr.Append(line);
         }
 
-        StreamWriter file = new StreamWriter(@"C:\Users\2cath\OneDrive\Documents\College\Fourth_Year\OSSE\Ongoing_Project\assembly_patterns\Example_Patterns\pattern_3_correct.txt");
+        StreamWriter file = new StreamWriter(@"C:\Users\2cath\OneDrive\Documents\College\Fourth_Year\OSSE\Ongoing_Project\assembly_patterns\Example_Patterns\pattern_6_correct.txt");
         file.Write(buildReturnStr.ToString());
         file.Close();
     }

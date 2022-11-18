@@ -35,8 +35,32 @@ public class heartbeat
         {
             Console.WriteLine("Nay Working");
         }
-        //p.test2 ......
+        if (p.test4())
+        {
+            Console.WriteLine("4 Working");
+        }
+        else
+        {
+            Console.WriteLine("Nay Working");
+        }
+        if (p.test5())
+        {
+            Console.WriteLine("5 Working");
+        }
+        else
+        {
+            Console.WriteLine("Nay Working");
+        }
+        if (p.test6())
+        {
+            Console.WriteLine("6 Working");
+        }
+        else
+        {
+            Console.WriteLine("Nay Working");
+        }
     }
+
 
     public bool test1()
     {
@@ -100,6 +124,84 @@ public class heartbeat
             stringPat.Append(str);
         }
         string pattern = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_3.txt");
+        string[] argsToTest = { pattern, assembly };
+
+        patternReturnInfo patternReturnInfo = pf.heartBeat(pattern, assembly);
+        StringBuilder returnedString = pf.hmsamm(patternReturnInfo);
+
+        //pf.heartBeat(pattern, assembly);
+        if (stringPat.ToString() == returnedString.ToString())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public bool test4()
+    {
+        pattern_finder pf = new pattern_finder();
+        //get correct pattern to compare program function and ensure its output is correct
+        string[] pat1 = System.IO.File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_4_correct.txt"));
+        StringBuilder stringPat = new StringBuilder();
+        foreach (string str in pat1)
+        {
+            stringPat.Append(str);
+        }
+        string pattern = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_4.txt");
+        string[] argsToTest = { pattern, assembly };
+
+        patternReturnInfo patternReturnInfo = pf.heartBeat(pattern, assembly);
+        StringBuilder returnedString = pf.hmsamm(patternReturnInfo);
+
+        //pf.heartBeat(pattern, assembly);
+        if (stringPat.ToString() == returnedString.ToString())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public bool test5()
+    {
+        pattern_finder pf = new pattern_finder();
+        //get correct pattern to compare program function and ensure its output is correct
+        string[] pat1 = System.IO.File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_5_correct.txt"));
+        StringBuilder stringPat = new StringBuilder();
+        foreach (string str in pat1)
+        {
+            stringPat.Append(str);
+        }
+        string pattern = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_5.txt");
+        string[] argsToTest = { pattern, assembly };
+
+        patternReturnInfo patternReturnInfo = pf.heartBeat(pattern, assembly);
+        StringBuilder returnedString = pf.hmsamm(patternReturnInfo);
+
+        //pf.heartBeat(pattern, assembly);
+        if (stringPat.ToString() == returnedString.ToString())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public bool test6()
+    {
+        pattern_finder pf = new pattern_finder();
+        //get correct pattern to compare program function and ensure its output is correct
+        string[] pat1 = System.IO.File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_6_correct.txt"));
+        StringBuilder stringPat = new StringBuilder();
+        foreach (string str in pat1)
+        {
+            stringPat.Append(str);
+        }
+        string pattern = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\assembly_patterns\Example_Patterns\pattern_6.txt");
         string[] argsToTest = { pattern, assembly };
 
         patternReturnInfo patternReturnInfo = pf.heartBeat(pattern, assembly);

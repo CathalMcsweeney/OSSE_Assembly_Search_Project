@@ -1,5 +1,4 @@
-# checks patterns in different groups printed in same method
-# Also checks Variable assigning
+# This pattern checks that the pattern input isnt incorrect
 check: add     x[0-9], x
 check: cmp     x[0-9]
 check-next: bne
