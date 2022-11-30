@@ -13,6 +13,9 @@ The script takes two input arguments
 ## Running the Code
 
 Example command line execution of script.  
+	
+	While in the Assembly_patterns directory
+
 	bash...  
 		$csc Program.cs  
 	...  
