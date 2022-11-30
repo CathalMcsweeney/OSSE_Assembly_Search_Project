@@ -7,9 +7,11 @@ using System.Text.RegularExpressions;
 
 
 public class pattern_finder
-{  
+{
     //dictionary uses the captured variable name in the first string
     //and assigns its content in the second string
+    public bool testOngoing = false;
+
     public Dictionary<string, string> capturedVariables = new Dictionary<string, string>();
 
     public StringBuilder buildReturnStr = new StringBuilder();
@@ -36,33 +38,52 @@ public class pattern_finder
 
 
         patternReturnInfo = p.heartBeat(pattern, assembly);
-
-        p.printFoundPatterns(patternReturnInfo); //only prints to screen when running 
-    }
-
-    public StringBuilder hmsamm(patternReturnInfo fndInfo)
-    {
-        List<foundCode> fndSnps = fndInfo.code;
-        foreach (foundCode fc in fndSnps)
+        if(patternReturnInfo != null)
         {
-            if (fc.method != null){
-                methodsFound++;
-                buildReturnStr.Append(fc.method);
+            p.printFoundPatterns(patternReturnInfo);//only prints to screen when running 
+        }
+    }
+         
+    public void testInProgress()
+    {
+        testOngoing = true;
+    }
+    public StringBuilder heartbeatReturnString(patternReturnInfo fndInfo)
+    {
+        if (fndInfo != null)
+        {
+            List<foundCode> fndSnps = fndInfo.code;
+
+
+            foreach (foundCode fc in fndSnps)
+            {
+                if (fc.method != null)
+                {
+                    methodsFound++;
+                    buildReturnStr.Append(fc.method);
+                }
+                if (fc.groupName != null)
+                {
+                    groupsFound++;
+                    buildReturnStr.Append(fc.groupName);
+                }
+                foreach (string line in fc.code)
+                {
+                    buildReturnStr.Append(line);
+                }
             }
-            if (fc.groupName != null){
-                groupsFound++;
-                buildReturnStr.Append(fc.groupName);
-            }
-            foreach (string line in fc.code) {
+            fndInfo.otherInfo.Add("\t" + methodsFound + " Methods. \t" + groupsFound + " groups.");
+            foreach (string line in fndInfo.otherInfo)
+            {
                 buildReturnStr.Append(line);
             }
+            string ret = buildReturnStr.ToString();
+            return buildReturnStr;
         }
-        fndInfo.otherInfo.Add("\t" + methodsFound + " Methods. \t" + groupsFound + " groups.");
-        foreach (string line in fndInfo.otherInfo){
-            buildReturnStr.Append(line);
+        else
+        {
+            return buildReturnStr;
         }
-        string ret = buildReturnStr.ToString();
-        return buildReturnStr;
     }
 
     public patternReturnInfo heartBeat(string pattern, string assembley)
@@ -115,11 +136,14 @@ public class pattern_finder
             return patRetInf;
         }
 
-        //if no matches found possible error
+        //if no matches found warning
         else
         {
-            #warning "0 Matches found"
-            Console.WriteLine("\n\n" + p.counter + " Matches Found \n\nCheck your Pattern file for correct input");
+            if (testOngoing == true) {
+                #warning "0 Matches found"
+                Console.WriteLine("\n\n" + p.counter + " Matches Found \n\nCheck your Pattern file for correct input");
+            }
+            buildReturnStr.Append(p.counter + " Matches Found Check your Pattern file for correct input");
             return null;
         }
     }
@@ -151,14 +175,14 @@ public class pattern_finder
 
                 for (int currLine = 0; currLine < testAc.code.Count;) //each line of code in a group
                 {
-                    string currPat = inPattern[currPatternLine].ToString();
-                    string comp = Regex.Replace(currPat, @"^[^\s]+\s*", "");
-                    string curCode = assemblyMethods[method].groups[group].code[currLine];
+                    string currPat = inPattern[currPatternLine].ToString(); //sets currently pattern from input string
+                    string comp = Regex.Replace(currPat, @"^[^\s]+\s*", ""); //changes input string to regular expression
+                    string curCode = assemblyMethods[method].groups[group].code[currLine]; //the current line of code being checked
                     nextLine = currLine + 1;
 
-                    if (currPat.Contains("?<<"))
+                    if (currPat.Contains("?<<")) //used for named parameters (ie assign a value to a parameter)
                     {
-                        Regex extractorRegex = new Regex(@"\?<<(\w+)>>");
+                        Regex extractorRegex = new Regex(@"\?<<(\w+)>>"); //removes the identifying syntax
                         MatchCollection extractedMatch = extractorRegex.Matches(currPat);
                         foreach (Match match in extractedMatch)
                         {
@@ -169,7 +193,7 @@ public class pattern_finder
 
                     if (currPat.StartsWith("check-next:") && checkNext(comp, method, group, currLine))
                     {
-                        invalidPattern = true;
+                        //invalidPattern = true;
                         string toAdd = assemblyMethods[method].groups[group].lineNum[currLine]+":\t "+ curCode;
                         tempFoundCode.Add(toAdd);
                         currPatternLine++;
@@ -301,8 +325,8 @@ public class pattern_finder
             Console.WriteLine(line);
             buildReturnStr.Append(line);
         }
-
-        StreamWriter file = new StreamWriter(@"C:\Users\2cath\OneDrive\Documents\College\Fourth_Year\OSSE\Ongoing_Project\assembly_patterns\Example_Patterns\pattern_6_correct.txt");
+        //saves as a local text file to be used for testing purposes
+        StreamWriter file = new StreamWriter(@"C:\Users\2cath\OneDrive\Documents\College\Fourth_Year\OSSE\Ongoing_Project\assembly_patterns\Example_Patterns\pattern_10_correct.txt");
         file.Write(buildReturnStr.ToString());
         file.Close();
     }
@@ -382,6 +406,8 @@ public class pattern_finder
     //reads in assembly code and parses through it removing filler & comments
     public void removeComments(string[] inputCode)
     {
+        bool assemblyFile = false;
+
         int lineCount = 0;
         int i = 0;
         int j = 0;
@@ -396,6 +422,7 @@ public class pattern_finder
             Match m = Regex.Match(line, rex);
             if (line.StartsWith("; Assembly listing for method "))
             {
+                assemblyFile = true;
                 i = 0;
                 //create new function object
                 assemblyMethod am = new assemblyMethod();
@@ -420,16 +447,31 @@ public class pattern_finder
             }
             else if (line.Length <= 15)
             {
-                try
+                if(assemblyFile==true)
                 {
-                    //make a new methods object 
-                    assemblyMethods[x].addGroup();
-                    assemblyMethods[x].groups[i].name = line;
-                    j++;
+                    try
+                    {
+                        //make a new methods object 
+                        assemblyMethods[x].addGroup();
+                        assemblyMethods[x].groups[i].name = line;
+                        j++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error in adding to 2D array", ex);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine("Error in adding to 2D array", ex);
+                    assemblyMethod am = new assemblyMethod();
+                    am.functionName = "N/A";
+                    assemblyMethods.Add(am);
+                    assemblyMethods[x].addGroup();
+                    assemblyMethods[x].groups[i].name = "N/A";
+                    string a = Regex.Replace(line, @"\s+\w+\s+", "");
+                    a = Regex.Replace(a, "\\s+", " ");
+                    assemblyMethods[x].groups[i].code.Add(a);
+                    assemblyMethods[x].groups[i].lineNum.Add(lineCount);
                 }
             }
             else if (line.Contains(";;"))
